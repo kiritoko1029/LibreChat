@@ -40,6 +40,7 @@ const { summaryBuffer } = require('./memory');
 const { runTitleChain } = require('./chains');
 const { tokenSplit } = require('./document');
 const BaseClient = require('./BaseClient');
+const { includes } = require('lodash');
 
 class OpenAIClient extends BaseClient {
   constructor(apiKey, options = {}) {
@@ -1124,7 +1125,6 @@ ${convo}
       }
 
       let modelOptions = { ...this.modelOptions };
-
       if (typeof onProgress === 'function') {
         modelOptions.stream = true;
       }
@@ -1132,6 +1132,11 @@ ${convo}
         modelOptions.messages = payload;
       } else {
         modelOptions.prompt = payload;
+      }
+
+      // 添加对 qwen 模型的支持
+      if (modelOptions.model && modelOptions.model.toLowerCase().includes('qwen')) {
+        modelOptions.enable_search = true;
       }
 
       const baseURL = extractBaseURL(this.completionsUrl);
